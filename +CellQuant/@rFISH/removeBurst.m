@@ -1,0 +1,18 @@
+function removeBurst(rfish,burstid)
+     
+        filterprops=rfish.filterprops;
+        for j=1:length(burstid)
+            id=burstid(j);
+        rfish.probeimages.burst_labeled_r(rfish.probeimages.burst_labeled_r==id)=0;
+        end
+        if ~isempty(find(rfish.probeimages.burst_labeled_r>0))
+            rfish.probeimages.burst_labeled_r=label(rfish.probeimages.burst_labeled_r>0);
+            rfish.burstdata_r=measure(rfish.probeimages.burst_labeled_r,rfish.probeimages.raw,rfish.measuretypes,[],filterprops.CONN,filterprops.BURST_MIN,filterprops.BURST_MAX);
+        else
+            rfish.probeimages.burst_labeled_r=[];
+            rfish.burstdata_r=[];
+        end
+      if isempty(rfish.burstdata_r)
+          rfish.probeimages.burst_labeled_r=[];
+      end
+        

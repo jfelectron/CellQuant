@@ -1,0 +1,22 @@
+
+function out=loadClones(clones)
+    basedir='/auto/sahara/namib/home/jefoley/LGM2_NSA_Noise/';
+    savedir='/auto/sahara/namib/home/jefoley/fitting/FISH_data3s/';
+    savedir2='/auto/sahara/namib/home/jefoley/fitting/FISH_data3c/';
+    out=struct();
+    for i=1:length(clones)
+        cd([basedir,'/LGM2_',clones{i},'/processed']);
+        load cellpop
+        cellpop.loadCelldata();
+        save cellpop
+        counts=cellpop.getMeasure('cells').Transcripts_strict;
+        ccounts=cellpop.getMeasure('cells').TCyt_W;
+        save([savedir,'LGM2_',clones{i},'.mat'],'counts');
+        save([savedir2,'LGM2_',clones{i},'.mat'],'ccounts');
+        out.(clones{i})=cellpop;
+        clear cellpop
+    end
+        
+        
+        
+end

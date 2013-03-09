@@ -1,0 +1,23 @@
+ function quantitateGFP(qcell,channel)
+
+
+GFPdata=qcell.celldata{channel};
+cellintensity=measure(qcell.masks{channel},qcell.raw{channel},{'Sum'});
+celldata=measure(label(fillholes(qcell.raw{channel}>median(qcell.raw{channel})),2,50000,0),[],{'Size','Center'});
+if size(cellintensity,1)>1
+    cellintensity=cellintensity(1);
+    display('GFP data wrong size!');
+end
+if isempty(cellintensity)
+    cellintensity=struct('ID',1,'Sum',0);
+end
+
+mferet=mean([GFPdata.feret(1),GFPdata.feret(2)]);
+qcell.celldata{channel}=dip_measurement('CellSize',celldata.Size,'CellMidSize',GFPdata.size,'Centroid',celldata.,'Mean_Feret',mferet,'Intensity',cellintensity.Sum,'Circularity',GFPdata.p2a);
+
+qcell.quantitated(channel)=1;
+
+
+
+
+

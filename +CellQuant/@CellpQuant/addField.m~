@@ -1,0 +1,46 @@
+function addField(cellpop,imfile)
+
+if strcmp(cellpop.type,'single')
+    cellpop.clearData();
+end
+    fieldname=strtok(imfile,cellpop.imext);
+    cellpop.nfields=cellpop.nfields+1;
+    cellpop.fieldhash=put(cellpop.fieldhash,cellpop.nfields,fieldname);
+    if strcmp(cellpop.type,'single')
+        cellpop.clearData();
+       fieldcells=cellpop.currentfield.getCells();
+       for i=1:numel(fieldcells)
+            cellpop.ncells=cellpop.ncells+1;
+            fishchannel=find(ismember(cellpop.Chtypes,'FISH')==1);
+            gfpchannel=find(ismember(cellpop.Chtypes,'GFP')==1);
+            FISHdata=fieldcells{i}.getCellData(fishchannel);
+            Burstdata=fieldcells{i}.getBurstData(fishchannel);
+            locdata=fieldcells{i}.getLocData(fishchannel);
+            numtranscripts=dip_measurement('Transcripts',size(FISHdata,1),...
+                'TNuc_G',length(locdata.N_greedy),'TCyt_G',length(locdata.C_greedy),...
+                'TNuc_W',length(locdata.N_weighted),'TCyt_W',length(locdata.C_weighted),'edge',locdata.edge...
+                'TxCenter',size(Burstdata,1));
+            
+            celldata=fieldcells{i}.getCellData(gfpchannel);
+            celldata=[celldata,numtranscripts];
+            celldata.ID=cellpop.ncells;
+            cellpop.addFISHdata(FISHdata,celldata.ID);
+            cellpop.addBurstdata(Burstdata,celldata.ID);
+            %adds FISH data to meta
+            %population array
+           if isempty(cellpop.cellpdata) %initialize if adding for the first time
+                cellpop.cellpdata=celldata;
+           else
+               cellpop.cellpdata=[cellpop.cellpdata;celldata];
+           end
+       end
+       cellpop.TCquant();
+   end
+        
+
+    
+    
+
+   
+    
+   

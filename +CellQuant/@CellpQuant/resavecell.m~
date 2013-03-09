@@ -1,0 +1,31 @@
+function resavecell(cellpop,fieldname,cellname,curcell)
+
+savedir=cellpop.savedir;
+savedir=[savedir,'/',fieldname,'/'];
+  savecell=sprintf('%s=curcell;',cellname);
+  eval(savecell);
+  delete([savedir,cellname,'.mat']);
+  save([savedir,cellname,'.mat'],cellname);
+  
+       if ~isempty(curcell.getBurstData(1))
+             boverlay=curcell.overlayburst(1,1);
+           if ~isempty(boverlay)
+                boverlayproj=iterate('max',boverlay,[],3);
+                writeim(squeeze(boverlayproj),[savedir,cellname,'_burstoverlay','.jpg'],'JPEG',0);
+           else
+               delete([savedir,cellname,'_burstoverlay','.jpg']); 
+           end
+             noverlay=curcell.overlayburst(3,1);
+              if ~isempty(noverlay)
+                nburstproj=iterate('max',noverlay,[],3);
+                writeim(squeeze(nburstproj),[savedir,cellname,'_burstnucprojection','.jpg'],'JPEG',0);
+              else
+             if exist([savedir,cellname,'_burstnucprojection','.jpg'],'file')
+                delete([savedir,cellname,'_burstnucprojection','.jpg']);
+             end
+              end
+              else
+           if exist([savedir,cellname,'_burstnucprojection','.jpg'],'file')
+           delete([savedir,cellname,'_burstnucprojection','.jpg']);
+           delete([savedir,cellname,'_burstoverlay','.jpg']);
+       end

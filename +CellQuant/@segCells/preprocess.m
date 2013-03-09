@@ -1,0 +1,11 @@
+function preprocess(cells)
+
+    L=log(cells.segimages.midsection+1);
+    G=gaussf(L,cells.filterprops.GAUSS_SIGMA);
+    H=L-G;
+    E=exp(H);
+    I=stretch(E);
+    cells.segimages.preprocess=I;
+    
+    %cells.segimages.preprocess=stretch(cells.segimages.midsection);
+    

@@ -1,0 +1,14 @@
+function probefilter(rfish)
+
+ rfish.filterprops=struct('TH_SHAPE','elliptic','TH_TYPE','texture','TH_COLOR','white','TH_SIZE',7,'PROBE_THRESH',0.5,...
+                    'BURST_THRESH',0.9,'CONN',2,'GRAD_SIGMA',0.9,'LABEL_MIN',30,'LABEL_MAX',300,'P2A_MAX',1.04,...
+                    'SA_MIN',85,'P2A_MIN',0.96,'GREY_SDMAX',1.3,'BURST_P2A',1.2,'BURST_MIN',150,'BURST_MAX',0,'BURST_MINSIZE',150,'BURST_MINSUM',4000,'BURST_MINSUMB',20000);
+    filterprops=rfish.filterprops;
+    rfish.probeimages.filtered=tophat(rfish.probeimages.raw,filterprops.TH_SIZE,filterprops.TH_SHAPE,filterprops.TH_TYPE,filterprops.TH_COLOR);
+    %rfish.probeimages.filtered=medif(rfish.probeimages.raw,3);
+    LoG15=-laplace(gaussf(rfish.probeimages.filtered,1.5),1.5);
+    LoG15(LoG15<0)=0;                                                                                                                                                                                                                                        
+    rfish.probeimages.filtered=LoG15;
+                                                                                                                        % rfish.probeimages.filteredG=gradmag(rfish.probeimages.filteredT,filterprops.GRAD_SIGMA);
+
+     % prev parameters thresh 2.5, P2A_MIN 0.96                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

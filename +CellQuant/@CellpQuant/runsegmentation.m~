@@ -1,0 +1,19 @@
+function runsegmentation(cellpop,imfil)
+
+%Create Image object, parse metadata, split channels
+
+
+ims=CellQuant.Image(cellpop.imfile,cellpop.savedir,cellpop.imdir);
+
+
+
+segfield=CellQuant.segCells(ims,cellpop.segchannel,cellpop.seedchannel);
+segfield.segmentCells();
+
+cellhandles=segfield.getCells();
+for i=1:numel(cellhandles)
+    qcell=cellhandles{i};
+    qcell.setChannelIDs(cellpop.Chtypes);
+end
+    
+cellpop.currentfield=segfield;

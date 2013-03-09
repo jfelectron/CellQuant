@@ -1,0 +1,65 @@
+function requant(cellpop)
+
+fishchannels=find(ismember(cellpop.Chtypes,'FISH')==1);
+for i=1:cellpop.nfields
+    field=get(cellpop.fieldhash,i);
+    fielddir=[cellpop.savedir,'/',field,'/'];
+    cells=dir([fielddir,'*.mat']);
+    for j=1:numel(cells)
+        try
+        load([fielddir,cells(j).name])
+        flag=1;
+        catch
+            disp('File load error');
+            flag=0;
+        end
+        if flag
+        cellname=strtok(cells(j).name,'.mat');
+        cellnumber=regexp(cellname,'R3D_','split');
+        cellnumber=str2double(cellnumber{2});
+        eval(sprintf('curcell=%s;',cellname));
+        curcell.setFilterProps(cellpop.fishprops);
+        curcell.quantitateFISH(fishcannels);
+        fieldcells=currentfield.getCells();
+        savecell=sprintf('%s=fieldcells{i};',cellname);
+        eval(savecell);
+ 
+    save([fieldddir,cellname,'.mat'],cellname);
+  flags=curcell.isquantitated();
+ if flags(1)
+    if ~isempty(fieldcells{i}.getCellData(1));
+        loverlay=fieldcells{i}.overlaylabel(1,1);
+        if ~isempty(loverlay)
+            loverlayproj=iterate('max',loverlay,[],3);
+            writeim(squeeze(loverlayproj),[savedir,cellname,'_fishoverlay','.jpg'],'JPEG',0);
+
+        end
+        goverlay=fieldcells{i}.overlaylabel(2,1);
+        if ~isempty(goverlay)
+            gfishproj=iterate('max',goverlay,[],3);
+            writeim(squeeze(gfishproj),[savedir,cellname,'_probegfpprojection','.jpg'],'JPEG',0);
+        end
+  end
+     if ~isempty(fieldcells{i}.getBurstData(1))
+             boverlay=fieldcells{i}.overlayburst(1,1);
+             noverlay=fieldcells{i}.overlayburst(3,1);
+           if ~isempty(boverlay)
+                boverlayproj=iterate('max',boverlay,[],3);
+                writeim(squeeze(boverlayproj),[savedir,cellname,'_burstoverlay','.jpg'],'JPEG',0);
+           end
+            if ~isempty(noverlay)
+                nburstproj=iterate('max',noverlay,[],3);
+                writeim(squeeze(nburstproj),[savedir,cellname,'_burstnucprojection','.jpg'],'JPEG',0);
+            end
+    end
+           
+           
+           
+       
+
+ end
+        end
+    end
+end
+   
+

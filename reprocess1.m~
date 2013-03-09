@@ -1,0 +1,15 @@
+
+
+clones={'FA2','GD3'};
+thresh=[0.4,0.5];
+basedir='/auto/sahara/namib/home/jefoley/LGM2_NSA_Noise/';
+
+for i=1:length(clones)
+    load([basedir,'LGM2_',clones{i},'/processed/cellpop.mat']);
+    cellpop.setProps('FISH',struct('TH_SHAPE','elliptic','TH_TYPE','texture','TH_COLOR','white','TH_SIZE',7,'PROBE_THRESH',0.5,'BURST_THRESH',0.9,'CONN',2,'GRAD_SIGMA',0.9,'LABEL_MIN',50,'LABEL_MAX',300,'P2A_MAX',1.02,'SA_MIN',85,'P2A_MIN',0.96,'P2A_ABSMAX',1.15,'SD_THRESH',1,'GREY_SDMAX',1.35,'BURST_MINSD',23));
+    cellpop.setProps('FISH',{'PROBE_THRESH',thresh(i)});
+    cellpop.process('requantitate',1);
+    clearvars -except clones thresh basedir i
+end
+loadClones(clones);
+exit

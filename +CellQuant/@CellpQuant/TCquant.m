@@ -1,0 +1,75 @@
+function TCquant(cellpop)
+
+singlemean=mean(cellpop.getMeasure('FISH').Sum);
+singleerror=std(cellpop.getMeasure('FISH').Sum);
+tcdata=cellpop.getMeasure('Bursts');
+fishdata=cellpop.getMeasure('FISH');
+rcellpdata=[];
+tcs=[];
+
+for i=1:size(cellpop.cellpdata,1)
+    celldata=cellpop.cellpdata(i);
+    ccentr=celldata.Centroid;
+    if ~isempty(tcdata)
+    tcs=find(tcdata.Cell_ID==i);
+    end
+   % if ~ismpety(fishdata)
+   %     cfish=find(fishdata.Cell_ID==i);
+        celltc=[];
+  %  end
+    if ~isempty(tcs)
+        celltc=tcdata(tcs);
+    end
+    %cellfish=fishdata(cfish);
+    tct=0;
+%    distances=zeros(numel(cfish),2);
+%     if size(celltc,1)==1
+%         if ~isempty(cfish)
+%             tctcntr=celltc.Center;
+% 
+%             for k=1:numel(cfish)
+%                 distances(k,1)=sqrt(sum((cellfish(cfish(k)).Center-tctcntr).^2));
+%             end
+%         end
+%     end
+%     if ~isempty(cfish)
+%         for l=1:numel(cfish)
+%             distances(l,2)=sqrt(sum((cellfish(cfish(l)).Center-ccentr).^2));
+%         end
+%     end
+%   
+%     if ~isempty(distances)
+%         tdist=mean(distances(:,1));
+%         cdist=mean(distances(:,2));
+%     else
+%         tdist=0;
+%         cdist=0;
+%     end
+%                 
+%        tdist=tdist/celldata.Mean_Feret; 
+%        tdistb=(tdist/celldata.CellSize)*10^6;
+%        cdist=cdist/celldata.Mean_Feret;
+%        cdistb=(cdist/celldata.CellSize)*10^6;
+%         
+    if size(celltc,1)~=0
+        for j=celltc.ID
+            tct=tct+(celltc(j).Sum)/singlemean;
+        end
+    end
+    TCtranscripts=round(tct);
+   
+        tcq=dip_measurement('TC_Transcripts',TCtranscripts,'Total_Transcripts',celldata.Transcripts+TCtranscripts);%,'Mean_distTC',tdist,'Mean_distTCb',tdistb,'Mean_distCntr',cdist,'Mean_distCntrb',cdistb);
+        tcq.ID=i;
+        celldata=[celldata,tcq];
+        if i==1
+            rcellpdata=celldata;
+        else
+            rcellpdata=[rcellpdata;celldata];
+        end
+end
+cellpop.cellpdata=rcellpdata;
+        
+
+
+
+

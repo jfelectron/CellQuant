@@ -1,0 +1,31 @@
+function currentfield=runquantitation(cellpop,currentfield)
+
+
+
+
+%update this with additional channels as needed
+fishchannels=find(ismember(cellpop.Chtypes,'FISH')==1);
+nucchannel=find(ismember(cellpop.Chtypes,'DAPI')==1);
+gfpchannel=find(ismember(cellpop.Chtypes,'GFP')==1);
+cherrychannel=find(ismember(cellpop.Chtypes,'mCherry')==1);
+
+cellhandles=currentfield.getCells();
+for i=1:numel(cellhandles)
+    cellhandles{i}.setFilterProps(cellpop.fishprops);
+    cellhandles{i}.training=cellpop.training;
+    celldata=cellhandles{i}.getCellData(gfpchannel);
+    if isfield(celldata,'CellSize')||isfield(celldata,'Size')&&celldata.Size>1000
+     cellhandles{i}.setFilterProps(cellpop.fishprops);
+        cellhandles{i}.quantitateFISH(fishchannels);
+        flags=cellhandles{i}.isquantitated();
+        cellhandles{i}.rlocalization(nucchannel,fishchannels);
+   
+        if ~flags(gfpchannel)
+            cellhandles{i}.quantitateGFP(gfpchannel);
+        end
+    end
+end
+clear cellhandles
+
+
+

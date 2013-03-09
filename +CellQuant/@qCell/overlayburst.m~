@@ -1,0 +1,28 @@
+function varargout=overlayburst(qcell,greych,burstch)
+%%Usage: qcell.overlaylabel(greych,labelch) 
+%%overlays desired qcell label channel (labelch) with grey channel (greych) 
+
+if isa(greych,'double') && isa(burstch,'double')
+    chid=qcell.ChannelsIDs;
+   if ~strcmp(qcell.channelIDs{greych},'GFP')
+        greyim=qcell.processed{greych};
+   else
+       greyim=qcell.raw{greych};
+   end
+        labelim=qcell.bursts{burstch}; 
+        if min(size(greyim)==size(labelim))
+            overlayout=overlay(greyim,labelim);
+        else
+            overlayout=[];
+        end
+   if ~nargout
+        
+        h=dipshow(overlayout);
+        diptruesize(h, 50);
+        varargout=[];
+        return;
+   end
+   varargout={overlayout};
+   
+   
+end

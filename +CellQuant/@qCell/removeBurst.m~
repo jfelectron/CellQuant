@@ -1,0 +1,8 @@
+function removeBurst(qcell,channel,burstid)
+
+  
+  qcell.qobjs{channel}.removeBurst(burstid)
+  qcell.burstdata{channels(i)}=qcell.qobjs{channel}.getBurstData();
+  qcell.bursts{channels(i)}=qcell.qobjs{channel}.getImage({'burst_relabeled'});
+
+     

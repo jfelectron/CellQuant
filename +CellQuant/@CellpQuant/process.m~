@@ -1,0 +1,142 @@
+function process(cellpop,varargin)
+
+if isempty(varargin)
+    type='all';
+else
+    type=varargin{1};
+   
+end
+
+
+
+    if strcmp(cellpop.type,'single')
+        if length(varargin)==2
+             silent=varargin{2};
+         else
+             silent=1;
+         end
+        
+        if strcmp(type,'all')||strcmp(type,'segment')
+            tic
+            cellpop.getID();
+            cellpop.currentfield=cellpop.runsegmentation(cellpop.imfile,silent);
+            toc
+        end
+        
+        if strcmp(type, 'all')||strcmp(type, 'quantitate')||strcmp(type,'training')
+                cellpop.training=1;
+                if ~isempty(cellpop.currentfield) && cellpop.currentfield.issegmented
+                    tic
+                    cellpop.runquantitation(cellpop.currentfield);
+                    toc
+                else
+                    if ~silent
+                        display('field must be segmented prior to quantitation');
+                    end
+                end
+        if cellpop.currentfield.issegmented()
+            cellpop.addField(cellpop.currentfield);
+        end
+        end
+        
+        
+     elseif strcmp(cellpop.type,'batch')
+         if length(varargin)==2
+             silent=varargin{2};
+         else
+             silent=1;
+         end
+       if isempty(cellpop.filenames)  
+        if isunix || ismac
+            imfiles=dir([cellpop.imdir,'/*',cellpop.imext]);
+        else
+            imfiles=dir([cellpop.imdir,'\*',cellpop.imext]);
+        end
+        cellpop.filenames=imfiles;
+        cellpop.filenames().segmented=[];
+        cellpop.filenames().quantitated=[];
+         cellpop.imfile=imfiles(1).name;
+         cellpop.getID();
+       end
+       
+       if strcmp(type,'requantitate') ||strcmp(type,'training');
+          for i=1:numel(cellpop.filenames)
+              cellpop.filenames(i).quantitated=[];
+          end
+       end
+        for i=1:numel(cellpop.filenames)
+           if strcmp(type,'all')||strcmp(type,'segment')
+            if isempty(cellpop.filenames(i).segmented)
+            tic
+            cellpop.filenames(i).name
+            imfile=cellpop.filenames(i).name;
+            currentfield=cellpop.runsegmentation(imfile,silent);
+               if currentfield.issegmented()
+               cellpop.filenames(i).segmented=1;
+               end
+             
+            end
+            if strcmp(type, 'all')&& currentfield.issegmented()
+                   currentfield=cellpop.runquantitation(currentfield);
+            end
+           
+                
+       
+          
+                cellpop.saveField(currentfield,imfile);
+                clear currentfield
+                toc
+           
+            end
+        
+            
+       
+            
+            
+            
+             
+            elseif strcmp(type,'quantitate')||strcmp(type,'requantitate')||
+               
+               if isempty(cellpop.filenames(i).quantitated)&&~isempty(cellpop.filenames(i).segmented)
+                savedir=cellpop.savedir;
+                imfile=cellpop.filenames(i).name;
+                cellpop.filenames(i).name
+                imstring=strtok(imfile,cellpop.imext);
+                savedir=[savedir,'/',imstring,'/'];
+                cd (savedir)
+                load([imstring,'.field'],'-mat')
+                savefield=sprintf('currentfield=%s;',imstring);
+                eval(savefield);
+                tic
+                currentfield=cellpop.runquantitation(currentfield);
+          
+                toc
+                cellpop.filenames(i).quantitated=1;
+                cellpop.saveField(currentfield,imfile);
+              
+                
+               end
+        end
+            
+                
+                
+            end
+          
+          save([cellpop.savedir,'/cellpop.mat'],'cellpop');
+         clearvars -except cellpop i type silent
+         % load([cellpop.savedir,'/cellpop.mat']);
+            
+        end
+        %save([cellpop.savedir,'/cellpop.mat'],'cellpop');
+       % if size(cellpop.resegment,1)>0
+        %    cd(cellpop.savedir)
+        %    pack
+        %    cellpop.mansegment(type);
+        %end
+       % cellpop.loadCelldata();
+    else
+        display('Error: type must be ''single'',''batch'',or ''all''')
+    end
+    
+
+end

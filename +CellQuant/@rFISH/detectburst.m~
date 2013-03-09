@@ -1,0 +1,37 @@
+function detectburst(rfish)
+
+
+        
+         filterprops=rfish.filterprops;
+        likelyBursts=find(rfish.probedata.stddev>20);
+     
+        
+      
+       
+        if ~isempty(likelyBursts)
+            likelyBurstData=rfish.probedata(likelyBursts);
+            candidateBurst=[];
+  
+            if numel(likelyBursts)>1
+                candidateBurst=find(rfish.burstdata.stddev==max(likelyBurstData.stddev));
+                if numel(candidateBurst)>1
+                    candidateBurst=find(rifsh.burstdata.sum==max(likelyB
+                end
+            else
+                candidateBurst=likelyBursts;
+            end
+      
+       if ~isempty(candidateBurst)
+           
+            rfish.probeimages.burst_labeled_r=newim(size(rfish.probeimages.burst_labeled));
+            rfish.probeimages.burst_labeled_r(rfish.probeimages.burst_labeled==candidateBurst)=candidateBurst;
+            rfish.probeimages.burst_labeled_r=label(rfish.probeimages.burst_labeled_r>0);
+            rfish.burstdata_r=measure(rfish.probeimages.burst_labeled_r,rfish.probeimages.raw,rfish.measuretypes,[],filterprops.CONN,filterprops.BURST_MIN,filterprops.BURST_MAX);
+       end
+       end
+      end
+       
+      
+     
+     
+      

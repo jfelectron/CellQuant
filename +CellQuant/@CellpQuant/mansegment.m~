@@ -1,0 +1,28 @@
+function mansegment(cellpop,type)
+
+
+
+
+for i=1:length(cellpop.filenames)
+         tic
+         
+         if isempty(cellpop.fil)
+       
+             if strcmp(type,'all')||strcmp(type,'segment')
+              currentfield=cellpop.runsegmentation(imfile,0);
+            end
+            if strcmp(type, 'all')||strcmp(type, 'quantitate')%&&currentfield.status('quantitate')
+                   currentfield=cellpop.runquantitation(currentfield);
+            end
+                
+
+            if currentfield.issegmented()
+                cellpop.addField(imfile);
+                cellpop.saveField(currentfield,imfile);
+                cellpop.resegment=put(cellpop.resegment,i,[]);
+                %save([cellpop.savedir,'/a.mat'],'cellpop');
+                clear currentfield
+                toc
+            end
+         end
+end

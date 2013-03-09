@@ -1,0 +1,39 @@
+function parseICS(istack)
+
+    if isunix
+        
+    fid=fopen(istack.imfile,'r');
+    a=textscan(fid,'%s %s',1,'Headerlines',2);
+    id=regexp(a{2},'[A-Z0-9]+_[A-Z0-9]+','match');
+    istack.ID=cell2mat(id{1}(1));
+    frewind(fid);
+    a=textscan(fid,'%s %s %u %u %u %u %u %u',1,'Headerlines',5); %get image dimensions
+    istack.dimensions=double(cell2mat([a(4:6)]));
+    istack.nch=double(cell2mat(a(8)));
+    
+    a=textscan(fid,'%s %s %f %f %f %f %f %f',1,'Headerlines',8); %get z-spacing
+    istack.zspacing=cell2mat(a(6));
+    
+    a=textscan(fid,'%s %s %s %f %f %f',1,'Headerlines',7); %get Ex wavelengths
+    istack.Ex=cell2mat(a(4:6));
+    
+    a=textscan(fid,'%s %s %s %f %f %f',1);
+    istack.Em=cell2mat(a(4:6));
+while ~feof(fid)    
+    a=textscan(fid,'%s',1,'Headerlines',1,'delimiter','\n');
+    if ~isempty(a{1});
+        iter=regexp(regexp(a{1}{1},'-it [0-9]+ ','match'),'[0-9]+','match'); %get decon iterations
+        if ~isempty(iter)
+            istack.decon.iter=cell2mat(iter{1});
+            istack.decon.SN=cell2mat(regexp(a{1}{1},'([0-9]+ ){3}[0-9]+','match')); %get decon SNR per channel
+            q=regexp(regexp(a{1}{1},'-q [0-9].[0-9]+ ','match'),'[0-9].[0-9]+','match');
+            istack.decon.q=cell2mat(q{1});
+    
+        end
+    end
+end
+    
+    
+    
+    
+    

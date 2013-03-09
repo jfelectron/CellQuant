@@ -1,0 +1,41 @@
+function burstmeasure=getBurstData(qcell,channel,varargin)
+ 
+
+    if ~isempty(qcell.burstdata{channel})
+        mtypes=fieldnames(qcell.burstdata{channel});
+    else
+          %display(sprintf('Channel %i contains no meausrements',channel))
+        burstmeasure=[];
+        return
+    end
+        
+ 
+    if ~isempty(varargin)
+    
+        measuretypes=varargin{1};
+   
+        nummeas=numel(measuretypes);
+        nobjs=numel(qcell.burstdata{channel}.id);
+        burstmeasure=cell(nummeas);
+        burstmeasurements=cell(nobjs,nummeas);
+        for i=1:nummeas
+            meas=measuretypes{i};
+            if ismember(meas,mtypes)
+                burstmeasure{i}=qcell.burstdata{channel}.(meas);
+                for j=1:nobjs
+                    burstmeasurements(j,i)={burstmeasure{i}(j)};
+                end
+            else
+                display(sprintf('%s not a measurement type in channel %i',meas,channel))
+                qcell.getMeasureTypes(channel);
+                burstmeasure=[];
+                return
+            end
+        end
+
+        burstmeasure=dip_measurement(cell2struct(burstmeasurements,measuretypes,2));
+    
+    else
+        burstmeasure=qcell.burstdata{channel};
+
+    end
